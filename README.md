@@ -1,0 +1,1 @@
+# odoo_location_script
