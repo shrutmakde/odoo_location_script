@@ -17,8 +17,8 @@ const STATE = "West Bengal";
 // --- 1. Block Master Excel ---
 const blockMap = new Map();
 data.forEach(row => {
-    const block = row["Block"];
-    const district = row["District"];
+    const block = row["Block"].trim();
+    const district = row["District"].trim();
     if (block && !blockMap.has(block)) {
         blockMap.set(block, { "Block Name": block, State: STATE, District: district });
     }
@@ -28,9 +28,9 @@ const blockMaster = Array.from(blockMap.values());
 // --- 2. Scheme Master Excel ---
 const schemeMap = new Map();
 data.forEach(row => {
-    const scheme = row["PWSS"];
-    const block = row["Block"];
-    const district = row["District"];
+    const scheme = row["PWSS"].trim();
+    const block = row["Block"].trim();
+    const district = row["District"].trim();
     if (scheme && !schemeMap.has(scheme)) {
         schemeMap.set(scheme, {
             "Scheme Name": scheme,
@@ -45,15 +45,16 @@ const schemeMaster = Array.from(schemeMap.values());
 // --- 3. Zone Master Excel ---
 const zoneMap = new Map();
 data.forEach(row => {
-    const scheme = row["PWSS"];
-    const zone = row["Zone"] || "N/A";
-    const block = row["Block"];
-    const district = row["District"];
+    const scheme = row["PWSS"].trim();
+    const zone = row["Zone"] ? row["Zone"].trim() : "N/A";
+    const block = row["Block"].trim();
+    const district = row["District"].trim();
 
     const key = `${scheme}-${zone}`;
     if (!zoneMap.has(key)) {
         zoneMap.set(key, {
             "Zone Name": zone,
+            State: STATE,
             Scheme: scheme,
             Block: block,
             District: district
@@ -77,25 +78,25 @@ const zoneMaster = Array.from(zoneMap.values());
 
 // --- 4. Pump Master Excel ---
 const pumpMaster = data.map(row => {
-    let type = ""; // Declare type before using it
+    // let type = ""; // Declare type before using it
     const pumpType = row["Pump Type"].trim(); // Trim spaces from input
 
-    if (pumpType === "Basic") {
-        type = "type_a";
-    } else if (pumpType === "Intermediate") {
-        type = "type_b";
-    }
+    // if (pumpType === "Basic") {
+    //     type = "type_a";
+    // } else if (pumpType === "Intermediate") {
+    //     type = "type_b";
+    // }
 
     return { // Ensure return statement
         "Pump House Name": row["Pump House No"],
-        "Pump House Type": type, // Properly assigned type
+        "Pump House Type": pumpType, // Properly assigned type
         State: STATE,
-        District: row["District"],
-        Block: row["Block"],
-        Scheme: row["PWSS"],
-        Zone: row["Zone"] || "N/A",
-        Latitude: row["Latitude"],
-        Longitude: row["Longitude"]
+        District: row["District"].trim(),
+        Block: row["Block"].trim(),
+        Scheme: row["PWSS"].trim(),
+        Zone: (row["Zone"] ? row["Zone"].trim() : "N/A") + " / " + row["PWSS"].trim(),
+        Latitude: row["Latitude"] ? String(row["Latitude"]).trim() : "0.00",
+        Longitude: row["Longitude"] ? String(row["Longitude"]).trim() : "0.00"
     };
 });
 
