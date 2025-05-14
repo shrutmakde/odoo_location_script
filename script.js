@@ -46,7 +46,7 @@ const schemeMaster = Array.from(schemeMap.values());
 const zoneMap = new Map();
 data.forEach(row => {
     const scheme = row["PWSS"];
-    const zone = row["Zone"] || "NA";
+    const zone = row["Zone"] || "N/A";
     const block = row["Block"];
     const district = row["District"];
 
@@ -62,15 +62,44 @@ data.forEach(row => {
 });
 const zoneMaster = Array.from(zoneMap.values());
 
+// // --- 4. Pump Master Excel ---
+// const pumpMaster = data.map(row => ({
+//     "Pump House Name": row["Pump House No"],
+//     "Pump House Type": row["Pump Type"],
+//     Scheme: row["PWSS"],
+//     Block: row["Block"],
+//     District: row["District"],
+//     Zone: row["Zone"] || "N/A",
+//     Latitude: row["Latitude"],
+//     Longitude: row["Longitude"]
+// }));
+
 // --- 4. Pump Master Excel ---
-const pumpMaster = data.map(row => ({
-    "Pump House Name": row["Pump House No"],
-    "Pump House Type": row["Pump Type"],
-    Scheme: row["PWSS"],
-    Block: row["Block"],
-    District: row["District"],
-    Zone: row["Zone"] || "NA"
-}));
+
+const pumpMaster = data.map(row => {
+    let type = ""; // Declare type before using it
+    const pumpType = row["Pump Type"].trim(); // Trim spaces from input
+
+    if (pumpType === "Basic") {
+        type = "type_a";
+    } else if (pumpType === "Intermediate") {
+        type = "type_b";
+    }
+
+    return { // Ensure return statement
+        "Pump House Name": row["Pump House No"],
+        "Pump House Type": type, // Properly assigned type
+        State: STATE,
+        District: row["District"],
+        Block: row["Block"],
+        Scheme: row["PWSS"],
+        Zone: row["Zone"] || "N/A",
+        Latitude: row["Latitude"],
+        Longitude: row["Longitude"]
+    };
+});
+
+
 
 // --- Write all outputs ---
 function writeExcel(filename, data) {
