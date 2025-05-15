@@ -80,6 +80,7 @@ const zoneMaster = Array.from(zoneMap.values());
 const pumpMaster = data.map(row => {
     // let type = ""; // Declare type before using it
     const pumpType = row["Pump Type"].trim(); // Trim spaces from input
+    const zone = row["Zone"] ? row["Zone"].trim() : "N/A";
 
     // if (pumpType === "Basic") {
     //     type = "type_a";
@@ -94,7 +95,8 @@ const pumpMaster = data.map(row => {
         District: row["District"].trim(),
         Block: row["Block"].trim(),
         Scheme: row["PWSS"].trim(),
-        Zone: (row["Zone"] ? row["Zone"].trim() : "N/A") + " / " + row["PWSS"].trim(),
+        // Zone: (row["Zone"] ? row["Zone"].trim() : "N/A") + " / " + row["PWSS"].trim(),
+        Zone: zone,
         Latitude: row["Latitude"] ? String(row["Latitude"]).trim() : "0.00",
         Longitude: row["Longitude"] ? String(row["Longitude"]).trim() : "0.00"
     };
