@@ -80,7 +80,7 @@ const zoneMaster = Array.from(zoneMap.values());
 const pumpMaster = data.map(row => {
     // let type = ""; // Declare type before using it
     const pumpType = row["Pump Type"].trim(); // Trim spaces from input
-    const zone = row["Zone"] ? row["Zone"].trim() : "N/A";
+    const zone = (row["Zone"] ? row["Zone"].trim() : "N/A") + " */* " + row["PWSS"].trim();
 
     // if (pumpType === "Basic") {
     //     type = "type_a";
