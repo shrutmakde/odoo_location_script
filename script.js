@@ -108,15 +108,15 @@ function writeExcel(filename, data) {
     const ws = xlsx.utils.json_to_sheet(data);
     const wb = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, ws, "Sheet1");
-    xlsx.writeFile(wb, `./output/${filename}`);
+    xlsx.writeFile(wb, `./output/${sheetName}/${filename}`);
 }
 
 // Ensure output directory exists
-if (!fs.existsSync('./output')) fs.mkdirSync('./output');
+if (!fs.existsSync(`./output/${sheetName}`)) fs.mkdirSync(`./output/${sheetName}`);
 
 writeExcel("Block_Master.xlsx", blockMaster);
 writeExcel("Scheme_Master.xlsx", schemeMaster);
 writeExcel("Zone_Master.xlsx", zoneMaster);
 writeExcel("Pump_Master.xlsx", pumpMaster);
 
-console.log("✅ All Excel files created in ./output");
+console.log(`✅ All Excel files created in ./output/${sheetName}`);
