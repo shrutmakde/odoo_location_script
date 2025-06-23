@@ -2,9 +2,9 @@ const xlsx = require("xlsx");
 const fs = require("fs");
 
 // Load the master workbook
-const workbook = xlsx.readFile("./PWMS PHED Location Master .xlsx");
+const workbook = xlsx.readFile("./PWMS PHED Location Master new.xlsx");
 
-// Get the "Nadia" sheet
+// Get the "North 24 Pgs" sheet
 const sheetName = "Nadia";
 const sheet = workbook.Sheets[sheetName];
 
@@ -17,8 +17,9 @@ const STATE = "West Bengal";
 // --- 1. Block Master Excel ---
 const blockMap = new Map();
 data.forEach(row => {
-    const block = row["Block"].trim();
-    const district = row["District"].trim();
+    if (!row["Block"] || !row["District"]) return; // Skip rows with missing Block or District
+    const block = String(row["Block"]).trim();
+    const district = String(row["District"]).trim();
     if (block && !blockMap.has(block)) {
         blockMap.set(block, { "Block Name": block, State: STATE, District: district });
     }
@@ -28,9 +29,10 @@ const blockMaster = Array.from(blockMap.values());
 // --- 2. Scheme Master Excel ---
 const schemeMap = new Map();
 data.forEach(row => {
-    const scheme = row["PWSS"].trim();
-    const block = row["Block"].trim();
-    const district = row["District"].trim();
+    if (!row["PWSS"] || !row["Block"] || !row["District"]) return;
+    const scheme = String(row["PWSS"]).trim();
+    const block = String(row["Block"]).trim();
+    const district = String(row["District"]).trim();
     if (scheme && !schemeMap.has(scheme)) {
         schemeMap.set(scheme, {
             "Scheme Name": scheme,
@@ -45,10 +47,11 @@ const schemeMaster = Array.from(schemeMap.values());
 // --- 3. Zone Master Excel ---
 const zoneMap = new Map();
 data.forEach(row => {
-    const scheme = row["PWSS"].trim();
-    const zone = row["Zone"] ? row["Zone"].trim() : "N/A";
-    const block = row["Block"].trim();
-    const district = row["District"].trim();
+//    if (!row["PWSS"] || !row["Block"] || !row["District"]) return;
+    const scheme = String(row["PWSS"]).trim();
+    const zone = row["Zone"] ? String(row["Zone"]).trim() : "N/A";
+    const block = String(row["Block"]).trim();
+    const district = String(row["District"]).trim();
 
     const key = `${scheme}-${zone}`;
     if (!zoneMap.has(key)) {
@@ -78,30 +81,21 @@ const zoneMaster = Array.from(zoneMap.values());
 
 // --- 4. Pump Master Excel ---
 const pumpMaster = data.map(row => {
-    // let type = ""; // Declare type before using it
-    const pumpType = row["Pump Type"].trim(); // Trim spaces from input
-    const zone = (row["Zone"] ? row["Zone"].trim() : "N/A") + " */* " + row["PWSS"].trim();
+    const pumpType = row["Pump Type"] ? String(row["Pump Type"]).trim() : "";
+    const zone = (row["Zone"] ? String(row["Zone"]).trim() : "N/A") + " */* " + (row["PWSS"] ? String(row["PWSS"]).trim() : "");
 
-    // if (pumpType === "Basic") {
-    //     type = "type_a";
-    // } else if (pumpType === "Intermediate") {
-    //     type = "type_b";
-    // }
-
-    return { // Ensure return statement
-        "Pump House Name": row["Pump House No"],
-        "Pump House Type": pumpType, // Properly assigned type
+    return {
+        "Pump House Name": row["Pump House No"] || "",
+        "Pump House Type": pumpType,
         State: STATE,
-        District: row["District"].trim(),
-        Block: row["Block"].trim(),
-        Scheme: row["PWSS"].trim(),
-        // Zone: (row["Zone"] ? row["Zone"].trim() : "N/A") + " / " + row["PWSS"].trim(),
+        District: row["District"] ? String(row["District"]).trim() : "",
+        Block: row["Block"] ? String(row["Block"]).trim() : "",
+        Scheme: row["PWSS"] ? String(row["PWSS"]).trim() : "",
         Zone: zone,
         Latitude: row["Latitude"] ? String(row["Latitude"]).trim() : "0.00",
         Longitude: row["Longitude"] ? String(row["Longitude"]).trim() : "0.00"
     };
 });
-
 
 // --- Write all outputs ---
 function writeExcel(filename, data) {
